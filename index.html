@@ -23,39 +23,79 @@
 
     <main id="main-content">
         <!-- Dashboard Section -->
-        <section id="dashboard"> class="app-view"
-            <h2>Summary</h2>
+        <section id="dashboard" class="app-view" role="region" aria-labelledby="h_dashboard">
+            <h2 id = h_dashboard>Spending Dashboard</h2>
             <div class="stats">
                 <div class="card">
                     <h3>Total Income</h3>
                     <p id = "total_income">$0.00</p>
                 </div>
                 <div class="card">
-                    <h3>Total Expenses</h3>
+                    <h3>Total Expense</h3>
                     <p id = "total_expense">$0.00</p>
                 </div>
                 <div class="card">
                     <h3>Balance</h3>
                     <p id = "balance">$0.00</p>
                 </div>
+                <div class="card">
+                    <h3>Top Category</h3>
+                    <p id = "top_category">N/A</p>
+                </div>
+                <div id="status_container" class="card">
+                    <h3>Status</h3>
+                    <p role= "status" aria-live="polite" id="status_target">Set your Budget in Settings.</p>
+                </div>
+            </div>
+
+            <div id="weekly_trend_chart">
+                <h3>Weekly Trend (Last 7 days)</h3>
             </div>
         </section>
 
-        <!-- Recent Transactions -->
-        <section id="transactions">
-            <h2>Recent Transactions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody id = "transactions_content">
-                </tbody>
-            </table>
+        <!--Transactions Sections-->
+        <section id="transactions" class="app-view" role="region" aria-labelledby="h_transactions">
+            <h2 id="h_transactions">All Transaction Records</h2>
+
+            <div class="search_controls">
+                <label for="regex_search">Search Using Regex</label>
+                <input id="regex_search" name="regex_searching" type="search" placeholder="/(transport|food)/i">
+            </div>
+
+            <div id="transactions_container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id = "transactions_content">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section for the Form to add new transactions -->
+        <section id="form" class="app-view" role="region" aria-labelledby="h_form">
+            <h2 id="h_form">New Transaction/ Edit Transaction</h2>
+            <form id="transaction_form">
+                <div role="status" aria-live="polite" id="form_error">Form Validation errors are anoounced here.</div>
+            </form>
+        </section>
+
+        <section id="settings" class="app-view" role="region" aria-labelledby="h_settings">
+            <h2 id="h_settings">Settings</h2>
+        </section>
+
+        <section id="about" class="app-view" role="region" aria-labelledby="h_about">
+            <h2 id="h_about">About</h2>
+            <p> Hello 👋 and Welcome to My Student Finance Tracker, made by a Zimbabwean Software Engineering Student😌</p>
+            <p>Purpose : This application is a Student Finance Tracker which allows students to track their income and expenditure</p>
+            <p>Contact: Github[mufarok-07]</p>
+
         </section>
     </main>
     <footer>

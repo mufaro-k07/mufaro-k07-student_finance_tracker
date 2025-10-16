@@ -1,0 +1,106 @@
+* {
+    /* Initial Setup of the padding and margin */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Helvetica, Serif;
+    background-color: lightgray;
+    color: aliceblue;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+:focus-visible {
+    outline: none;
+    outline-offset: 2px;
+}
+
+.skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.skip-link:focus {
+    padding: 10px;
+    background: black;
+    color: white;
+}
+
+header {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid lightgray;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+nav button {
+    border: 1px solid lightgray;
+    background: none;
+    padding: 1rem 2rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+nav button:active {
+    background-color: lightgray;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    padding: 1rem;
+    margin: 1rem;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+}
+
+.card h3 {
+    color: aliceblue;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* Styling the Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table th, table td {
+    border: 1px solid lightgray;
+    padding: 1rem;
+    text-align: left;
+}
+
+/* Footer */
+footer {
+    display: flex;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    border-top: 1px solid lightgray;
+}
