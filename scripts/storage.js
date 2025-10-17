@@ -1,5 +1,6 @@
 // This is the javascript which handles saving to localStorage
 
+
 const KEY = 'financeTracker';
 const SETTINGS_KEY = 'financesettings';
 

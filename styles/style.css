@@ -27,11 +27,11 @@ main {
 
 .skip-link {
     position: absolute;
-    top: 0;
-    left: 0;
+    left: -9999px;
 }
 
 .skip-link:focus {
+    position: static;
     padding: 10px;
     background: black;
     color: white;

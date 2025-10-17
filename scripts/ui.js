@@ -3,14 +3,15 @@ import { highlight, compileRegex} from "./search.js";
 
 const MENU = {
     dashboard: document.getElementById("dashboard"),
-    records: document.getElementById("records"),
+    transaction: document.getElementById("transactions"),
     form: document.getElementById("form"),
     settings: document.getElementById("settings"),
     about: document.getElementById("about"),
 
 }
 
-const TableBody = document.getElementById("transactions_container");
+const TableBody = document.getElementById("transactions_content");
+// just check for Navigation button
 const NavigationButton = document.getElementById("navigation-button");
 
 let Sort_State = {field: 'date', direction: 'desc'};
@@ -47,7 +48,7 @@ const DataToSort = (data, field) => {
         let b = d[field];
 
         if (field === 'amount') {
-            a = parsefloat(a)
+            a = parseFloat(a)
             b = parseFloat(b)
         }
 
@@ -67,7 +68,7 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
     const regex = compileRegex(regexQuery);
 
     if (recordsToRender.length === 0) {
-        contentTableBody.innerHTML = '<tr><td colspan="5">No records found.</td></tr>'
+        TableBody.innerHTML = '<tr><td colspan="5">No records found.</td></tr>'
         return;
     }
 
@@ -112,6 +113,7 @@ export const transaction_filter = (query = '') => {
 };
 // Elements for the Dashboard
 const totalExpense = document.getElementById('total_expense');
+const totalIncome = document.getElementById('total_income');
 const balance = document.getElementById('balance');
 const topCategory = document.getElementById('top_category');
 const trendChart = document.getElementById('weekly_trend_chart');
@@ -138,6 +140,7 @@ export const updateDashboard = () => {
     const data = state.getData()
     const settings = state.getSettings()
 
+    let totalIncome = 0
     let totalExpense = 0
     let Balance = 0
     const categoryTotal = {}
@@ -149,7 +152,7 @@ export const updateDashboard = () => {
     data.forEach(record => {
         Balance += record.amount
         if (record.amount > 0) {
-            totalExpense += record.amount
+            totalExpense += Math.abs(record.amount)
 
             const category = record.category || 'Other';
             categoryTotal[category] = (categoryTotal[category] || 0) + record.amount;

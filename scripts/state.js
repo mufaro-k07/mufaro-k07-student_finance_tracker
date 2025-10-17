@@ -1,4 +1,4 @@
-import * as storage from "./storage";
+import * as storage from "./storage.js";
 
 let appData = storage.load()
 let appSettings = storage.loadSettings()
@@ -34,6 +34,7 @@ export const addTransaction = (record) => {
 };
 
 export const deleteTransaction = (delete_id) => {
+    Index=(r => r.id === delete_id)
     appData.splice(appData.indexOf(delete_id), 1);
 
     StateUpdates();

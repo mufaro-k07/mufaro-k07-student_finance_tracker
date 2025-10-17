@@ -37,7 +37,7 @@ export const Valid = (type, value) => {
     }
     // The advanced regex checker for the duplicate words
     if (type === 'description' && REGEX_PATTERNS.duplicates.pattern.test(val)) {
-        return REGEX_PATTERNS.duplicates.error;
+        return null;
     }
-    return null;
+    return REGEX_PATTERNS.duplicates.error;
 };

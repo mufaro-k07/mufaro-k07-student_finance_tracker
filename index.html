@@ -9,12 +9,11 @@
 <body>
 <a href="#main-content" class="skip-link">Skip to Content</a>
     <header>
-        <h1>Finance Tracker</h1>
+        <h1>Student Finance Tracker</h1>
         <nav>
             <ul>
                 <li><button data-view="dashboard" class="active">Dashboard</button></li>
-                <li><button data-view="records">Records Table</button></li>
-                <li><button data-view="form">Add/Edit Form</button></li>
+                <li><button data-view="transactions">Transactions</button></li>
                 <li><button data-view="about">About</button></li>
                 <li><button data-view="settings">Settings</button></li>
             </ul>
@@ -22,9 +21,9 @@
     </header>
 
     <main id="main-content">
-        <!-- Dashboard Section -->
+        <!--  Sections (which are my semantic elements included) -->
         <section id="dashboard" class="app-view" role="region" aria-labelledby="h_dashboard">
-            <h2 id = h_dashboard>Spending Dashboard</h2>
+            <h2 id = h_dashboard>Welcome to your Spending Dashboard</h2>
             <div class="stats">
                 <div class="card">
                     <h3>Total Income</h3>
@@ -43,19 +42,20 @@
                     <p id = "top_category">N/A</p>
                 </div>
                 <div id="status_container" class="card">
-                    <h3>Status</h3>
+                    <h3>Budget Goal Status</h3>
                     <p role= "status" aria-live="polite" id="status_target">Set your Budget in Settings.</p>
                 </div>
             </div>
 
             <div id="weekly_trend_chart">
                 <h3>Weekly Trend (Last 7 days)</h3>
+                <div id="trend_chart"></div>
             </div>
         </section>
 
         <!--Transactions Sections-->
-        <section id="transactions" class="app-view" role="region" aria-labelledby="h_transactions">
-            <h2 id="h_transactions">All Transaction Records</h2>
+        <section id="transactions" class="app-view hidden" role="region" aria-labelledby="h_transactions">
+            <h2 id="h_transactions">All Transactions</h2>
 
             <div class="search_controls">
                 <label for="regex_search">Search Using Regex</label>
@@ -66,10 +66,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Amount</th>
+                            <th data-sort="date">Date</th>
+                            <th data-sort="description">Description</th>
+                            <th data-sort="category">Category</th>
+                            <th data-sort="amount">Amount</th>
                         </tr>
                     </thead>
                     <tbody id = "transactions_content">
@@ -79,18 +79,70 @@
         </section>
 
         <!-- Section for the Form to add new transactions -->
-        <section id="form" class="app-view" role="region" aria-labelledby="h_form">
+        <section id="form" class="app-view hidden" role="region" aria-labelledby="h_form">
             <h2 id="h_form">New Transaction/ Edit Transaction</h2>
+            <div role="status" aria-live="polite" id="form_error">Form Validation errors are announced here.</div>
             <form id="transaction_form">
-                <div role="status" aria-live="polite" id="form_error">Form Validation errors are anoounced here.</div>
+                <label for="form_description">Description</label>
+                <input type="text" id="form_description" name="form_description" required>
+
+                <label for="form_type">Type</label>
+                <select id="form_type" name="form_type">
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                </select>
+
+                <label for="form_amount">Amount ($)</label>
+                <input type="number" id="form_amount" name="form_amount" step="0.01" min="0" required>
+
+                <label for="form_category">Category</label>
+                <input type="text" id="form_category" name="form_category" list="default_categories" required>
+                <datalist id="default_categories">
+                    <option value="Food">Food</option>
+                    <option value="Books">Medicine</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Fees">Fees</option>
+                    <option value="Other">Other</option>
+                </datalist>
+
+                <label for="form_date">Date in the format (YYYY-MM-DD)</label>
+                <input type="date" id="form_date" name="form_date" required>
+
+                <button type="submit" id="form_submit" style="margin-top: 15px">Save Transaction</button>
             </form>
         </section>
 
-        <section id="settings" class="app-view" role="region" aria-labelledby="h_settings">
+        <section id="settings" class="app-view hidden" role="region" aria-labelledby="h_settings">
             <h2 id="h_settings">Settings</h2>
+
+            <fieldset>
+                <legend>Budget Cap</legend>
+                <label for="setting_cap">Set your Monthly Spending ($)</label>
+                <input id="setting_cap" name="setting_cap" type="number" min="0.00" step="0.01" value="0.00">
+                <button id="cap_button">Save Budget Cap</button>
+            </fieldset>
+
+            <fieldset style="margin-top: 20px;">
+                <legend>Currency Settings</legend>
+                <label for="base_currency">Set your Base Currency ($)</label>
+                <select id="base_currency">
+                    <option value="USD">USD</option>
+                    <option value="RWF">RWF</option>
+                </select>
+            </fieldset>
+
+            <fieldset style ="margin-top: 20px;">
+                <legend>Data Import / Export</legend>
+                <button id="export_button">Export Data (Into JSON)</button>
+                <label for="import_file" style="display: block; margin-top: 10px;">Import Data (From JSON)</label>
+                <input type="file" accept="application/json" id="import_file">
+                <button id="import_button" disabled>Load Imported File</button>
+                <p id="import_status" role="status" aria-live="polite" style="font-size: 0.9em;"></p>
+            </fieldset>
         </section>
 
-        <section id="about" class="app-view" role="region" aria-labelledby="h_about">
+        <section id="about" class="app-view hidden" role="region" aria-labelledby="h_about">
             <h2 id="h_about">About</h2>
             <p> Hello 👋 and Welcome to My Student Finance Tracker, made by a Zimbabwean Software Engineering Student😌</p>
             <p>Purpose : This application is a Student Finance Tracker which allows students to track their income and expenditure</p>
@@ -101,6 +153,6 @@
     <footer>
         <p>&copy; 2025 Student Finance Tracker | Built by Mufaro Kunze</p>
     </footer>
-    <script src="scripts/main.js"></script>
+    <script type="module" src="scripts/main.js"></script>
 </body>
 </html>
