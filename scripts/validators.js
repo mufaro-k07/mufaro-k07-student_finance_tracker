@@ -1,6 +1,6 @@
 export const REGEX_PATTERNS = {
     description: {
-        pattern: /^\S(?:.*\S)?$|^$/,
+        pattern: /^\S(?:.*\S)?$/,
         error: "Description cannot have leading or trailing spaces."
     },
     amount: {
@@ -30,14 +30,14 @@ export const Valid = (type, value) => {
     }
 
     // Changing the value for testing
-    const val = String(value).trim();
-
-    if (match.pattern.test(val)) {
-        return match.error;
+    const val = String(value); // don’t trim if you want to *catch* leading/trailing; trim only after normalizing
+    if (!match.pattern.test(val)) {
+        return match.error
     }
+
     // The advanced regex checker for the duplicate words
     if (type === 'description' && REGEX_PATTERNS.duplicates.pattern.test(val)) {
-        return null;
+        return REGEX_PATTERNS.duplicates.error;
     }
-    return REGEX_PATTERNS.duplicates.error;
+    return null;
 };

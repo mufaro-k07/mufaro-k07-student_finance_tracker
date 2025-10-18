@@ -1,12 +1,15 @@
 import * as storage from "./storage.js";
+import * as ui from "./ui.js";
 
 let appData = storage.load()
 let appSettings = storage.loadSettings()
 
 const StateUpdates = () => {
     storage.save(appData);
+    ui.refreshtransactions()
+    ui.updateDashboard()
 
-}
+};
 // Getters
 export const getData = () => appData
 export const getSettings = () => appSettings;
@@ -24,18 +27,21 @@ export const addTransaction = (record) => {
         category: record.category,
         date: record.date,
 
-        id: 'txn' +Date.now(),
+        id: 'txn_' +Date.now(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     };
     appData.push(newTransaction);
-
     StateUpdates();
 };
 
 export const deleteTransaction = (delete_id) => {
-    Index=(r => r.id === delete_id)
-    appData.splice(appData.indexOf(delete_id), 1);
+    const index = appData.findIndex(record => record.id === delete_id);
+
+    if (index !== -1) {
+        appData.splice(index, 1);
+        updateStateandSave();
+    }
 
     StateUpdates();
 };
@@ -60,6 +66,11 @@ export const updateTransaction = (update_id, updates) => {
     if (found) {
         StateUpdates();
     }
+};
+export const updateSettings = (updates) => {
+    appSettings = { ...appSettings, ...updates };
+    storage.saveSettings(appSettings);
+    ui.updateDashboard()
 };
 
 

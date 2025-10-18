@@ -21,7 +21,7 @@ main {
 }
 
 :focus-visible {
-    outline: none;
+    outline: 3px solid lightgray;
     outline-offset: 2px;
 }
 

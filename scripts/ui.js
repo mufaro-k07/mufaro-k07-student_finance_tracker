@@ -11,8 +11,16 @@ const MENU = {
 }
 
 const TableBody = document.getElementById("transactions_content");
-// just check for Navigation button
-const NavigationButton = document.getElementById("navigation-button");
+const navigationButton = document.querySelectorAll("nav button");
+const tableHeader = document.querySelectorAll("#transactions_table th[data-sort]");
+
+// Elements for the Dashboard
+const totalExpense = document.getElementById('total_expense');
+const totalIncome = document.getElementById('total_income');
+const balance = document.getElementById('balance');
+const topCategory = document.getElementById('top_category');
+const trendChart = document.getElementById('weekly_trend_chart');
+const targetStatus = document.getElementById('status_target');
 
 let Sort_State = {field: 'date', direction: 'desc'};
 
@@ -22,11 +30,10 @@ export const View = (viewId) => {
     const target = MENU[viewId];
     if (target) target.classList.remove('hidden');
 
-    NavigationButton.forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('data-view') === viewId) {
-            button.classList.add('active');
-        }
+    navigationButton.forEach(button => {
+        const active = btn.getAttribute('data-view') === viewId;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-current', active ? 'page' : 'false');
     })
 }
 
@@ -44,18 +51,18 @@ const DataToSort = (data, field) => {
 // Creating a copy of the array to sort so that the original one is not affected
 
     const sorted = [...data].sort((a, b) => {
-        let a = c[field];
-        let b = d[field];
 
         if (field === 'amount') {
-            a = parseFloat(a)
-            b = parseFloat(b)
+            comparison = parseFloat(a.amount) - parseFloat(b.amount);
+        } else if (field === 'amount') {
+            comparison = new Date(a.date).getTime() - new Date(a.date).getTime();
         }
+        return sortState.direction === 'asc' ? comparison : comparison * -1;
 
         let comparison = 0
-        if (a > b)
+        if (valC > valD)
             comparison = 1;
-        else if (a < b)
+        else if (valC < valD)
             comparison = -1;
 
         return Sort_State.direction === 'asc' ? comparison : comparison * -1;
@@ -76,7 +83,7 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
 
     recordsToRender.forEach(record => {
         const formatAmount = (amount) => {
-            const sign = amount < 0 ? 'Income: ' : 'Expense: '
+            const sign = amount < 0 ? 'Income: ' : 'Expense: ';
             return sign + Math.abs(amount).toFixed(2);
         };
 
@@ -96,7 +103,7 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
         `;
     });
 
-    contentTableBody.innerHTML = htmlContent;
+    TableBody.innerHTML = htmlContent;
 };
 
 // Sorting, filtering and rendering the data based on the search
@@ -111,18 +118,14 @@ export const transaction_filter = (query = '') => {
     }
     renderRecords(data, query)
 };
-// Elements for the Dashboard
-const totalExpense = document.getElementById('total_expense');
-const totalIncome = document.getElementById('total_income');
-const balance = document.getElementById('balance');
-const topCategory = document.getElementById('top_category');
-const trendChart = document.getElementById('weekly_trend_chart');
-const targetStatus = document.getElementById('status_target');
+
+
 
 // Updating the Spending Cap ARIS Live Message
 const updateCap = (totalExpense, cap) => {
     if (!cap || cap <= 0) {
         targetStatus.textContent = 'The Budget Cap has not been set. Please set one in Settings.';
+        targetStatus.setAttribute('aria-live', 'polite');
     }
 
     const remaining = cap - totalExpense;
@@ -147,7 +150,7 @@ export const updateDashboard = () => {
     let last7Days = 0
 
     // First getting the start date for the last 7 days
-    const SevendaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const SevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
     data.forEach(record => {
         Balance += record.amount
@@ -158,9 +161,11 @@ export const updateDashboard = () => {
             categoryTotal[category] = (categoryTotal[category] || 0) + record.amount;
 
             const Timestamp = new Date(record.date).getTime();
-            if (Timestamp >= SevendaysAgo) {
+            if (Timestamp >= SevenDaysAgo) {
                 last7Days += record.amount
             }
+        } else if (record.amount < 0) {
+            totalIncome += Math.abs(record.amount)
         }
     });
 
@@ -174,8 +179,22 @@ export const updateDashboard = () => {
         }
     }
     totalExpense.textContent = `${totalExpense.toFixed(2)}`;
+    totalIncome.textContent = `${totalIncome.toFixed(2)}`;
     balance.textContent = `${balance.toFixed(2)}`;
     topCategory.textContent = category_first;
-    trendChart.style.querySelector("h3").textContent = `Last 7 Days, You have spent: $${last7Days.toFixed(2)}`;
+    trendChart.querySelector("h3").textContent = `Last 7 Days, You have spent: $${last7Days.toFixed(2)}`;
     updateCap(totalExpense, settings.cap);
+};
+
+export const refreshRecords = (query = '') => {
+    let data = state.getData()
+
+    data = DataToSort(data, Sort_State.field)
+    if (query) {
+        const re = compileRegex(query);
+        if (re) {
+            data = data.filter(record => re.test(record.description))
+        }
+    }
+    renderRecords(data, query)
 };
