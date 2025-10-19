@@ -1,78 +1,109 @@
 import * as storage from "./storage.js";
 import * as ui from "./ui.js";
+import { Valid } from './validators.js'
 
-let appData = storage.load()
-let appSettings = storage.loadSettings()
+let appData = (() => {
+    try {
+        const data = storage.load()
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        console.error("Error loading app data", e)
+        return [];
+    }
+})();
+
+// These are the Default Settings
+export const settings = {
+    cap: 0,
+    baseCurrency: "USD",
+    exchangeRate: {}
+
+};
+
+let appSettings = {...settings,...(storage.loadSettings?.() || {}) };
 
 const StateUpdates = () => {
-    storage.save(appData);
-    ui.refreshtransactions()
-    ui.updateDashboard()
+    try {
+        storage.save(appData);
+        ui.refreshTransactions()
+        ui.updateDashboard()
+    } catch (e) {
+        console.error("Error saving or updating app data", e)
+    }
 
 };
 // Getters
 export const getData = () => appData
 export const getSettings = () => appSettings;
-export const settings = {
-    cap: 0,
-    baseCurrency: "USD",
-    exchangeRate: {}
-};
 
 // Adding a New Transaction
 export const addTransaction = (record) => {
-    const newTransaction = {
-        description: record.description,
-        amount: record.amount,
-        category: record.category,
-        date: record.date,
+    try {
+        const fields = ['description', 'amount', 'category', 'date'];
+        for (let field of fields) {
+            const error = Valid(field, record[field]);
+            if (error) {
+                console.error(`Invalid ${field} entered: ${error}`);
+                alert(`Invalid ${field} entered: ${error}`);
+                return false;
+            }
+        }
 
-        id: 'txn_' +Date.now(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    };
-    appData.push(newTransaction);
-    StateUpdates();
+        const newTransaction = {
+            ...record,
+            id: 'txn_' + Date.now(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+
+        appData.push(newTransaction);
+        StateUpdates();
+        return true;
+
+    } catch (e) {
+        console.error("Error adding transaction", e);
+        return false;
+    }
 };
 
 export const deleteTransaction = (delete_id) => {
-    const index = appData.findIndex(record => record.id === delete_id);
-
-    if (index !== -1) {
-        appData.splice(index, 1);
-        updateStateandSave();
+    try {
+        const index = appData.findIndex(record => record.id === delete_id);
+        if (index !== -1) {
+            appData.splice(index, 1);
+            StateUpdates();
+        } else {
+            console.warn("Transaction deleted failed, not found", delete_id);
+        }
+    } catch (e) {
+        console.error("Error deleting transaction", e);
     }
-
-    StateUpdates();
 };
 
 export const updateTransaction = (update_id, updates) => {
-    let found = false;
-
-    appData.forEach((record, index) => {
-        if (record.id === update_id) {
-
-            for (const key in updates) {
-                if (key === update_id) {
-                    appData[index][key] = updates[key];
-                }
-            }
-
-            appData[index].updatedAt = new Date().toISOString();
-            found = true;
+    try {
+        const index = appData.findIndex(r => r.id === update_id);
+        if (index === -1) {
+            console.warn("Transaction not found:", update_id);
+            return;
         }
-    });
 
-    if (found) {
+        Object.assign(appData[index], updates, {
+            updatedAt: new Date().toISOString()
+        });
+
         StateUpdates();
+    } catch (e) {
+        console.error("Error updating transaction:", e);
     }
 };
+
 export const updateSettings = (updates) => {
-    appSettings = { ...appSettings, ...updates };
-    storage.saveSettings(appSettings);
-    ui.updateDashboard()
+    try {
+        appSettings = { ...appSettings, ...updates };
+        storage.saveSettings(appSettings);
+        ui.updateDashboard();
+    } catch (e) {
+        console.error("Error updating settings:", e);
+    }
 };
-
-
-
-

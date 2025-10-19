@@ -1,0 +1,56 @@
+[
+  {
+    "description": "Groceries from supermarket",
+    "amount": 30.00,
+    "category": "Food",
+    "date": "2025-10-10"
+  },
+  {
+    "description": "Prescribed medicine from pharmacy",
+    "amount": 15.75,
+    "category": "Medicine",
+    "date": "2025-10-12"
+  },
+  {
+    "description": "Campus shuttle fare",
+    "amount": 2.50,
+    "category": "Transport",
+    "date": "2025-10-13"
+  },
+  {
+    "description": "Movie night with friends",
+    "amount": 12.00,
+    "category": "Entertainment",
+    "date": "2025-10-11"
+  },
+  {
+    "description": "Semester tuition fee",
+    "amount": 250.00,
+    "category": "Fees",
+    "date": "2025-09-01"
+  },
+  {
+    "description": "Bought programming textbook",
+    "amount": 40.00,
+    "category": "Books",
+    "date": "2025-10-03"
+  },
+  {
+    "description": "Donation to local shelter",
+    "amount": 5.00,
+    "category": "Other",
+    "date": "2025-10-09"
+  },
+  {
+    "description": "Part-time tutoring payment",
+    "amount": -120.00,
+    "category": "Income",
+    "date": "2025-10-07"
+  },
+  {
+    "description": "Monthly allowance",
+    "amount": -200.00,
+    "category": "Income",
+    "date": "2025-10-01"
+  }
+]

@@ -12,7 +12,7 @@ const MENU = {
 
 const TableBody = document.getElementById("transactions_content");
 const navigationButton = document.querySelectorAll("nav button");
-const tableHeader = document.querySelectorAll("#transactions_table th[data-sort]");
+const tableHeaders = document.querySelectorAll("#transactions_table th[data-sort]");
 
 // Elements for the Dashboard
 const totalExpense = document.getElementById('total_expense');
@@ -31,9 +31,9 @@ export const View = (viewId) => {
     if (target) target.classList.remove('hidden');
 
     navigationButton.forEach(button => {
-        const active = btn.getAttribute('data-view') === viewId;
-        btn.classList.toggle('active', active);
-        btn.setAttribute('aria-current', active ? 'page' : 'false');
+        const active = button.getAttribute('data-view') === viewId;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
     })
 }
 
@@ -49,27 +49,37 @@ const DataToSort = (data, field) => {
     }
 
 // Creating a copy of the array to sort so that the original one is not affected
-
     const sorted = [...data].sort((a, b) => {
-
+        let comparison = 0;
         if (field === 'amount') {
             comparison = parseFloat(a.amount) - parseFloat(b.amount);
-        } else if (field === 'amount') {
-            comparison = new Date(a.date).getTime() - new Date(a.date).getTime();
+        } else if (field === 'date') {
+            comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+        } else {
+            comparison = a[field].localeCompare(b[field], undefined, { sensitivity: 'base' });
         }
-        return sortState.direction === 'asc' ? comparison : comparison * -1;
-
-        let comparison = 0
-        if (valC > valD)
-            comparison = 1;
-        else if (valC < valD)
-            comparison = -1;
 
         return Sort_State.direction === 'asc' ? comparison : comparison * -1;
     });
+
+    // H: Update ARIA attributes on headers after sorting
+    updateAriaSort();
+
     return sorted;
 };
-// Rendering the the transactions
+
+const updateAriaSort = () => {
+    tableHeaders.forEach(header => {
+        header.setAttribute('aria-sort', 'none');
+
+        if (header.getAttribute('data-sort') === Sort_State.field) {
+            const status = Sort_State.direction === 'asc' ? 'ascending' : 'descending';
+            header.setAttribute('aria-sort', status);
+        }
+    });
+};
+
+// Rendering the transactions
 export const renderRecords = (recordsToRender, regexQuery = '') => {
     TableBody.innerHTML = '';
     const regex = compileRegex(regexQuery);
@@ -83,7 +93,7 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
 
     recordsToRender.forEach(record => {
         const formatAmount = (amount) => {
-            const sign = amount < 0 ? 'Income: ' : 'Expense: ';
+            const sign = amount < 0 ? 'Expense: ' : 'Income: ';
             return sign + Math.abs(amount).toFixed(2);
         };
 
@@ -106,30 +116,16 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
     TableBody.innerHTML = htmlContent;
 };
 
-// Sorting, filtering and rendering the data based on the search
-export const transaction_filter = (query = '') => {
-    let data = state.getData()
-    data = DataToSort(data, Sort_State.field)
-    if (query) {
-        const re = compileRegex(query);
-        if (re) {
-            data = data.filter(record => re.test(record.description))
-        }
-    }
-    renderRecords(data, query)
-};
-
-
-
-// Updating the Spending Cap ARIS Live Message
-const updateCap = (totalExpense, cap) => {
+// This constant updates the dashboard
+const updateCapStatus = (totalExpense, cap) => {
     if (!cap || cap <= 0) {
         targetStatus.textContent = 'The Budget Cap has not been set. Please set one in Settings.';
         targetStatus.setAttribute('aria-live', 'polite');
+        return;
     }
 
     const remaining = cap - totalExpense;
-    if (remaining > 0) {
+    if (remaining >= 0) {
         targetStatus.textContent = `You have $${remaining.toFixed(2)} remaining in your budget.`
         targetStatus.setAttribute('aria-live', 'polite')
     } else {
@@ -143,50 +139,59 @@ export const updateDashboard = () => {
     const data = state.getData()
     const settings = state.getSettings()
 
-    let totalIncome = 0
-    let totalExpense = 0
-    let Balance = 0
-    const categoryTotal = {}
-    let last7Days = 0
+    let sumIncome = 0
+    let sumExpense = 0
+    let netBalance = 0
+    const categoryTotals = {}
+    let last7DaysSpending = 0
 
     // First getting the start date for the last 7 days
     const SevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
     data.forEach(record => {
-        Balance += record.amount
+        netBalance += record.amount;
+
         if (record.amount > 0) {
-            totalExpense += Math.abs(record.amount)
-
-            const category = record.category || 'Other';
-            categoryTotal[category] = (categoryTotal[category] || 0) + record.amount;
-
-            const Timestamp = new Date(record.date).getTime();
-            if (Timestamp >= SevenDaysAgo) {
-                last7Days += record.amount
-            }
+            sumIncome += record.amount; // Income is positive
         } else if (record.amount < 0) {
-            totalIncome += Math.abs(record.amount)
+            sumExpense += Math.abs(record.amount); // Expense is negative
+        }
+
+        // Category totals should sum absolute expenses
+        if (record.amount < 0) {
+            const category = record.category || 'Other';
+            categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(record.amount);
+        }
+
+        // Weekly trend only counts expenses
+        const timestamp = new Date(record.date).getTime();
+        if (record.amount < 0 && timestamp >= SevenDaysAgo) {
+            last7DaysSpending += Math.abs(record.amount);
         }
     });
 
     let category_first = 'Not Set'
     let max_spend = -1
 
-    for (const cat in categoryTotal) {
-        if (categoryTotal[cat] > max_spend) {
-            max_spend = categoryTotal[cat]
+    for (const cat in categoryTotals) {
+        if (categoryTotals[cat] > max_spend) {
+            max_spend = categoryTotals[cat]
             category_first = cat
         }
     }
-    totalExpense.textContent = `${totalExpense.toFixed(2)}`;
-    totalIncome.textContent = `${totalIncome.toFixed(2)}`;
-    balance.textContent = `${balance.toFixed(2)}`;
+    totalExpense.textContent = `${sumExpense.toFixed(2)}`;
+    totalIncome.textContent = `${sumIncome.toFixed(2)}`;
+    balance.textContent = `${netBalance.toFixed(2)}`;
     topCategory.textContent = category_first;
-    trendChart.querySelector("h3").textContent = `Last 7 Days, You have spent: $${last7Days.toFixed(2)}`;
-    updateCap(totalExpense, settings.cap);
+
+    if (trendChart) {
+        const h3 = trendChart.querySelector('h3');
+        if (h3) h3.textContent = `This is your Weekly Trend: $${last7DaysSpending.toFixed(2)}`;
+    }
+    updateCapStatus(sumExpense, settings.cap)
 };
 
-export const refreshRecords = (query = '') => {
+export const refreshTransactions = (query = '') => {
     let data = state.getData()
 
     data = DataToSort(data, Sort_State.field)
@@ -197,4 +202,15 @@ export const refreshRecords = (query = '') => {
         }
     }
     renderRecords(data, query)
+};
+
+// For the announcements
+export const announce = (message, politeness = 'polite') => {
+    const statusRegion = document.getElementById('import-status'); // Reusing a polite status region
+    if (statusRegion) {
+        statusRegion.setAttribute('aria-live', politeness);
+        statusRegion.textContent = message;
+
+        setTimeout(() => statusRegion.setAttribute('aria-live', 'polite'), 1000);
+    }
 };

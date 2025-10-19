@@ -1,7 +1,7 @@
 export const REGEX_PATTERNS = {
     description: {
         pattern: /^\S(?:.*\S)?$/,
-        error: "Description cannot have leading or trailing spaces."
+        error: "Description must noy have leading or trailing spaces."
     },
     amount: {
         pattern: /^(0|[1-9]\d*)(\.\d{1,2})?$/,
@@ -13,11 +13,11 @@ export const REGEX_PATTERNS = {
     },
     category: {
         pattern: /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/,
-        error: "Category can only contain letters, spaces, and hyphens."
+        error: "Category must only contain letters, spaces, and hyphens."
     },
     duplicates: {
         pattern: /\b(\w+)\s+\1\b/i,
-        error: "Description contains duplicate consecutive words."
+        error: "Description must not contain duplicate consecutive words."
     }
 };
 
@@ -26,18 +26,18 @@ export const Valid = (type, value) => {
     const match = REGEX_PATTERNS[type];
 
     if(!match) {
-        return "Regex validation has not been configured.";
+        return { valid: false, error:"Regex validation has not been configured."};
     }
 
     // Changing the value for testing
-    const val = String(value); // don’t trim if you want to *catch* leading/trailing; trim only after normalizing
+    const val = String(value);
     if (!match.pattern.test(val)) {
-        return match.error
+        return { valid: false, error: match.error };
     }
 
     // The advanced regex checker for the duplicate words
     if (type === 'description' && REGEX_PATTERNS.duplicates.pattern.test(val)) {
-        return REGEX_PATTERNS.duplicates.error;
+        return { valid: false, error: REGEX_PATTERNS.duplicates.error};
     }
-    return null;
+    return {valid: true, error: null};
 };

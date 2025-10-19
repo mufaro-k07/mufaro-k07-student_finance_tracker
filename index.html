@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+
+<!-- Including the skip to content feature -->
 <a href="#main-content" class="skip-link">Skip to Content</a>
     <header>
         <h1>Student Finance Tracker</h1>
-        <nav>
+        <nav aria-label="Main Menu">
             <ul>
                 <li><button data-view="dashboard" class="active">Dashboard</button></li>
                 <li><button data-view="transactions">Transactions</button></li>
@@ -21,8 +23,8 @@
     </header>
 
     <main id="main-content">
-        <!--  Sections (which are my semantic elements included) -->
-        <section id="dashboard" class="app-view" role="region" aria-labelledby="h_dashboard">
+        <!--  Sections (which are my semantic elements included), it is also the Dashboard Section-->
+        <section id="dashboard" class="app-view" role="region" aria-labelledby="h_dashboard" tabindex="-1">
             <h2 id = h_dashboard>Welcome to your Spending Dashboard</h2>
             <div class="stats">
                 <div class="card">
@@ -43,7 +45,7 @@
                 </div>
                 <div id="status_container" class="card">
                     <h3>Budget Goal Status</h3>
-                    <p role= "status" aria-live="polite" id="status_target">Set your Budget in Settings.</p>
+                    <p role= "alert" aria-live="assertive" id="status_target">Set your Budget in Settings.</p>
                 </div>
             </div>
 
@@ -53,13 +55,14 @@
             </div>
         </section>
 
-        <!--Transactions Sections-->
-        <section id="transactions" class="app-view hidden" role="region" aria-labelledby="h_transactions">
+        <!--Transactions Section-->
+        <section id="transactions" class="app-view hidden" role="region" aria-labelledby="h_transactions" tabindex="-1">
             <h2 id="h_transactions">All Transactions</h2>
 
             <div class="search_controls">
                 <label for="regex_search">Search Using Regex</label>
-                <input id="regex_search" name="regex_searching" type="search" placeholder="/(transport|food)/i">
+                <input id="regex_search" name="regex_searching" type="search" placeholder="/(transport|food)/i" aria-describedby=search_hint">
+                <small id="search_hint">Use regex to search, e.g., /(coffee|tea)/i</small>
             </div>
 
             <div id="transactions_container">
@@ -79,12 +82,18 @@
         </section>
 
         <!-- Section for the Form to add new transactions -->
-        <section id="form" class="app-view hidden" role="region" aria-labelledby="h_form">
+        <section id="form" class="app-view hidden" role="region" aria-labelledby="h_form" tabindex="-1">
             <h2 id="h_form">New Transaction/ Edit Transaction</h2>
             <div role="status" aria-live="polite" id="form_error">Form Validation errors are announced here.</div>
+
             <form id="transaction_form">
                 <label for="form_description">Description</label>
-                <input type="text" id="form_description" name="form_description" required>
+                <input
+                        type="text"
+                        id="form_description"
+                        name="form_description"
+                        required
+                />
 
                 <label for="form_type">Type</label>
                 <select id="form_type" name="form_type">
@@ -113,13 +122,14 @@
             </form>
         </section>
 
-        <section id="settings" class="app-view hidden" role="region" aria-labelledby="h_settings">
+        <!-- This the Section for Settings -->
+        <section id="settings" class="app-view hidden" role="region" aria-labelledby="h_settings" tabindex="-1">
             <h2 id="h_settings">Settings</h2>
 
             <fieldset>
                 <legend>Budget Cap</legend>
                 <label for="setting_cap">Set your Monthly Spending ($)</label>
-                <input id="setting_cap" name="setting_cap" type="number" min="0.00" step="0.01" value="0.00">
+                <input id="setting_cap" name="setting_cap" type="number" min="0.00" step="0.01" value="0.00" required>
                 <button id="cap_button">Save Budget Cap</button>
             </fieldset>
 
@@ -142,16 +152,17 @@
             </fieldset>
         </section>
 
-        <section id="about" class="app-view hidden" role="region" aria-labelledby="h_about">
+        <!-- This is for the About Section -->
+        <section id="about" class="app-view hidden" role="region" aria-labelledby="h_about" tabindex="-1">
             <h2 id="h_about">About</h2>
             <p> Hello 👋 and Welcome to My Student Finance Tracker, made by a Zimbabwean Software Engineering Student😌</p>
-            <p>Purpose : This application is a Student Finance Tracker which allows students to track their income and expenditure</p>
+            <p>Purpose : This app helps students to track their income and spending and budget easily.</p>
             <p>Contact: Github[mufarok-07]</p>
 
         </section>
     </main>
     <footer>
-        <p>&copy; 2025 Student Finance Tracker | Built by Mufaro Kunze</p>
+        <p>&copy; 2025 Student Finance Tracker | Built by Mufaro Kunze 💚</p>
     </footer>
 
 </body>
