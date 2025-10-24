@@ -32,12 +32,12 @@ export const Valid = (type, value) => {
     // Changing the value for testing
     const val = String(value);
     if (!match.pattern.test(val)) {
-        return { valid: false, error: match.error };
+        return match.error
     }
 
     // The advanced regex checker for the duplicate words
     if (type === 'description' && REGEX_PATTERNS.duplicates.pattern.test(val)) {
-        return { valid: false, error: REGEX_PATTERNS.duplicates.error};
+        return REGEX_PATTERNS.duplicates.error;
     }
-    return {valid: true, error: null};
+    return null;
 };

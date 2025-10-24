@@ -89,7 +89,7 @@ const Settings_Saved = () => {
     ui.announce('Settings saved successfully!', 'polite');
 };
 
-const LoadApp = () => {
+const loadApp = () => {
     console.log('The Student Finance Tracker has been Initialised.')
 
     // Handles the navigation buttons
@@ -147,4 +147,4 @@ const LoadApp = () => {
 }
 
 form.addEventListener('submit', handleFormSubmit);
-LoadApp();
+loadApp();

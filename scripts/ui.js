@@ -3,7 +3,7 @@ import { highlight, compileRegex} from "./search.js";
 
 const MENU = {
     dashboard: document.getElementById("dashboard"),
-    transaction: document.getElementById("transactions"),
+    transactions: document.getElementById("transactions"),
     form: document.getElementById("form"),
     settings: document.getElementById("settings"),
     about: document.getElementById("about"),
@@ -11,7 +11,7 @@ const MENU = {
 }
 
 const TableBody = document.getElementById("transactions_content");
-const navigationButton = document.querySelectorAll("nav button");
+const navigationButton = document.querySelectorAll("nav button[data-view]");
 const tableHeaders = document.querySelectorAll("#transactions_table th[data-sort]");
 
 // Elements for the Dashboard
@@ -29,6 +29,7 @@ export const View = (viewId) => {
 
     const target = MENU[viewId];
     if (target) target.classList.remove('hidden');
+    target.focus()
 
     navigationButton.forEach(button => {
         const active = button.getAttribute('data-view') === viewId;
@@ -93,7 +94,7 @@ export const renderRecords = (recordsToRender, regexQuery = '') => {
 
     recordsToRender.forEach(record => {
         const formatAmount = (amount) => {
-            const sign = amount < 0 ? 'Expense: ' : 'Income: ';
+            const sign = amount > 0 ? 'Income: ' : 'Expense: ';
             return sign + Math.abs(amount).toFixed(2);
         };
 
@@ -189,6 +190,7 @@ export const updateDashboard = () => {
         if (h3) h3.textContent = `This is your Weekly Trend: $${last7DaysSpending.toFixed(2)}`;
     }
     updateCapStatus(sumExpense, settings.cap)
+    recentTransactions();
 };
 
 export const refreshTransactions = (query = '') => {
@@ -214,3 +216,33 @@ export const announce = (message, politeness = 'polite') => {
         setTimeout(() => statusRegion.setAttribute('aria-live', 'polite'), 1000);
     }
 };
+
+//To load the most recent transactions
+export function recentTransactions(allTransactions) {
+    const list = document.getElementById("recent_list");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    const recent = allTransactions.slice(-5).reverse();
+    if (recent.length === 0) {
+        list.innerHTML = "<li>No transactions yet.</li>";
+        return;
+    }
+
+    recent.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = `${t.date} - ${t.description} (${t.category}) $${t.amount}`;
+        list.appendChild(li);
+    });
+}
+
+document.addEventListener("click", (e) => {
+    if (e.target.matches("#shortcut_button")) {
+        View("form"); // jump to form view
+    } else if (e.target.matches("#view_all_transactions")) {
+        View("transactions"); // jump to all transactions
+    }
+});
+
+

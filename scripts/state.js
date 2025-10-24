@@ -1,6 +1,5 @@
 import * as storage from "./storage.js";
 import * as ui from "./ui.js";
-import { Valid } from './validators.js'
 
 let appData = (() => {
     try {
@@ -38,32 +37,19 @@ export const getSettings = () => appSettings;
 
 // Adding a New Transaction
 export const addTransaction = (record) => {
-    try {
-        const fields = ['description', 'amount', 'category', 'date'];
-        for (let field of fields) {
-            const error = Valid(field, record[field]);
-            if (error) {
-                console.error(`Invalid ${field} entered: ${error}`);
-                alert(`Invalid ${field} entered: ${error}`);
-                return false;
-            }
-        }
 
-        const newTransaction = {
-            ...record,
-            id: 'txn_' + Date.now(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
+    const newTransaction = {
+        description: record.description,
+        amount: record.amount,
+        category: record.category,
+        date: record.date,
 
-        appData.push(newTransaction);
-        StateUpdates();
-        return true;
-
-    } catch (e) {
-        console.error("Error adding transaction", e);
-        return false;
-    }
+        id: 'txn_' + Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    };
+    appData.push(newTransaction);
+    StateUpdates();
 };
 
 export const deleteTransaction = (delete_id) => {

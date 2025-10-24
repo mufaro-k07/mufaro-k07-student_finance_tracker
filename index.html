@@ -10,12 +10,14 @@
 
 <!-- Including the skip to content feature -->
 <a href="#main-content" class="skip-link">Skip to Content</a>
+
     <header>
         <h1>Student Finance Tracker</h1>
         <nav aria-label="Main Menu">
             <ul>
                 <li><button data-view="dashboard" class="active">Dashboard</button></li>
                 <li><button data-view="transactions">Transactions</button></li>
+                <li><button data-view="form">Form</button></li>
                 <li><button data-view="about">About</button></li>
                 <li><button data-view="settings">Settings</button></li>
             </ul>
@@ -25,7 +27,9 @@
     <main id="main-content">
         <!--  Sections (which are my semantic elements included), it is also the Dashboard Section-->
         <section id="dashboard" class="app-view" role="region" aria-labelledby="h_dashboard" tabindex="-1">
-            <h2 id = h_dashboard>Welcome to your Spending Dashboard</h2>
+            <h2 id = h_dashboard>Your Expenditure Dashboard</h2>
+            <p id="tip_message">Tip of the day😎: Start small- a dollar a days keeps poverty away</p>
+
             <div class="stats">
                 <div class="card">
                     <h3>Total Income</h3>
@@ -45,13 +49,27 @@
                 </div>
                 <div id="status_container" class="card">
                     <h3>Budget Goal Status</h3>
-                    <p role= "alert" aria-live="assertive" id="status_target">Set your Budget in Settings.</p>
+                    <p role= "status" aria-live="assertive" id="status_target">Set your Budget in Settings.</p>
                 </div>
             </div>
 
             <div id="weekly_trend_chart">
                 <h3>Weekly Trend (Last 7 days)</h3>
                 <div id="trend_chart"></div>
+            </div>
+
+            <!-- Including recent Transactions -->
+            <div id="recent_transactions" class="card">
+                <h3>Recent Transactions</h3>
+                <ul id="recent_list">
+
+                </ul>
+                <button id="view_all_transactions" data-view="transactions">View All</button>
+            </div>
+
+            <!-- New Transaction Shortcut button -->
+            <div class="quick-add">
+                <button id="shortcut_button" data-view="form">+ Add New Transactions</button>
             </div>
         </section>
 
@@ -91,24 +109,24 @@
                 <input
                         type="text"
                         id="form_description"
-                        name="form_description"
+                        name="description"
                         required
                 />
 
                 <label for="form_type">Type</label>
-                <select id="form_type" name="form_type">
+                <select id="form_type" name="type">
                     <option value="expense">Expense</option>
                     <option value="income">Income</option>
                 </select>
 
                 <label for="form_amount">Amount ($)</label>
-                <input type="number" id="form_amount" name="form_amount" step="0.01" min="0" required>
+                <input type="number" id="form_amount" name="amount" step="0.01" min="0" required>
 
                 <label for="form_category">Category</label>
-                <input type="text" id="form_category" name="form_category" list="default_categories" required>
+                <input type="text" id="form_category" name="category" list="default_categories" required>
                 <datalist id="default_categories">
                     <option value="Food">Food</option>
-                    <option value="Books">Medicine</option>
+                    <option value="Books">Books</option>
                     <option value="Transport">Transport</option>
                     <option value="Entertainment">Entertainment</option>
                     <option value="Fees">Fees</option>
@@ -116,9 +134,9 @@
                 </datalist>
 
                 <label for="form_date">Date in the format (YYYY-MM-DD)</label>
-                <input type="date" id="form_date" name="form_date" required>
+                <input type="date" id="form_date" name="date" required>
 
-                <button type="submit" id="form_submit" style="margin-top: 15px">Save Transaction</button>
+                <button type="submit" id="form_submit" style="margin-top: 15px" data-action="add-edit">Save Transaction</button>
             </form>
         </section>
 
@@ -153,17 +171,18 @@
         </section>
 
         <!-- This is for the About Section -->
-        <section id="about" class="app-view hidden" role="region" aria-labelledby="h_about" tabindex="-1">
+        <section id="about" class="app-view" role="region" aria-labelledby="h_about" tabindex="-1">
             <h2 id="h_about">About</h2>
             <p> Hello 👋 and Welcome to My Student Finance Tracker, made by a Zimbabwean Software Engineering Student😌</p>
             <p>Purpose : This app helps students to track their income and spending and budget easily.</p>
             <p>Contact: Github[mufarok-07]</p>
+            <p>Email: m.kunze@alustudent.com</p>
 
         </section>
     </main>
     <footer>
         <p>&copy; 2025 Student Finance Tracker | Built by Mufaro Kunze 💚</p>
     </footer>
-
+    <script type="module" src="./scripts/app.js"></script>
 </body>
 </html>

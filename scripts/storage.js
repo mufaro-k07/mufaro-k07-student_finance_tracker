@@ -34,7 +34,7 @@ export const save = (data) => {
 
 export const loadSettings = () => {
     try {
-        const settingsString = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+        const settingsString = localStorage.getItem(SETTINGS_KEY);
         return settingsString ? JSON.parse(settingsString) : {cap: 0, baseCurrency: "USD"};
     } catch (e) {
         console.error("Error in loading settings from localStorage", e);
