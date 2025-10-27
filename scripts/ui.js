@@ -9,6 +9,7 @@ const MENU = {
     about: document.getElementById("about"),
 
 }
+MENU.about.classList.add("cardish");
 
 const TableBody = document.getElementById("transactions_content");
 const navigationButton = document.querySelectorAll("nav button[data-view]");
@@ -30,6 +31,10 @@ export const View = (viewId) => {
     const target = MENU[viewId];
     if (target) target.classList.remove('hidden');
     target.focus()
+
+    if (viewId === 'dashboard' && MENU.about) {
+        MENU.about.classList.remove('hidden');
+    }
 
     navigationButton.forEach(button => {
         const active = button.getAttribute('data-view') === viewId;
@@ -190,7 +195,7 @@ export const updateDashboard = () => {
         if (h3) h3.textContent = `This is your Weekly Trend: $${last7DaysSpending.toFixed(2)}`;
     }
     updateCapStatus(sumExpense, settings.cap)
-    recentTransactions();
+    recentTransactions(state.getData());
 };
 
 export const refreshTransactions = (query = '') => {
@@ -208,14 +213,14 @@ export const refreshTransactions = (query = '') => {
 
 // For the announcements
 export const announce = (message, politeness = 'polite') => {
-    const statusRegion = document.getElementById('import-status'); // Reusing a polite status region
+    const statusRegion = document.getElementById('import_status'); // <-- underscore matches HTML
     if (statusRegion) {
         statusRegion.setAttribute('aria-live', politeness);
         statusRegion.textContent = message;
-
         setTimeout(() => statusRegion.setAttribute('aria-live', 'polite'), 1000);
     }
 };
+
 
 //To load the most recent transactions
 export function recentTransactions(allTransactions) {
@@ -224,7 +229,7 @@ export function recentTransactions(allTransactions) {
 
     list.innerHTML = "";
 
-    const recent = allTransactions.slice(-5).reverse();
+    const recent = (allTransactions || []).slice(-5).reverse();
     if (recent.length === 0) {
         list.innerHTML = "<li>No transactions yet.</li>";
         return;
@@ -244,5 +249,3 @@ document.addEventListener("click", (e) => {
         View("transactions"); // jump to all transactions
     }
 });
-
-

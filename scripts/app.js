@@ -8,6 +8,8 @@ import {loadSettings, exportData, importData } from "./storage.js";
 const form = document.getElementById("transaction_form");
 form.noValidate = true;
 const formErrors = document.getElementById("form_error");
+let editingId = null;
+const submitButton = document.getElementById("form_submit");
 
 //Settings and Navigation elements
 const BudgetCapInput = document.getElementById("setting_cap");
@@ -56,6 +58,28 @@ const handleFormSubmit = (event) => {
         amount = Math.abs(amount)
     }
 
+    const normalized = {
+        description: record.description.trim(),
+        category: record.category.trim(),
+        date: record.date,
+        amount
+    };
+
+    if (editingId) {
+        state.updateTransaction(editingId, normalized);
+        editingId = null;
+        submitButton.textContent = 'Save Transaction';
+        submitButton.setAttribute('data-action', 'add-edit');
+        ui.View('transactions');
+        ui.announce('Transaction updated!', 'polite');
+    } else {
+        state.addTransaction(normalized);
+        ui.View('transactions');
+        ui.announce('Transaction added successfully!', 'polite');
+    }
+
+    form.reset();
+};
     // It creates and add the final transaction object
     const finalTransaction = {
         description: record.description.trim(),
@@ -67,8 +91,7 @@ const handleFormSubmit = (event) => {
     state.addTransaction(finalTransaction);
     form.reset();
     ui.View('transactions');
-    ui.announce('Transaction added successfully!', 'polite'); // Announce success
-};
+    ui.announce('Transaction added successfully!', 'polite');
 
 const Settings_Saved = () => {
     const capValue = parseFloat(BudgetCapInput.value);
@@ -86,7 +109,8 @@ const Settings_Saved = () => {
     })
 
     ui.updateDashboard();
-    ui.announce('Settings saved successfully!', 'polite');
+    const pretty = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(capValue);
+    ui.announce(capValue > 0 ? `Budget cap set: ${pretty} ${currencyValue}` : 'Budget cap cleared', 'polite');
 };
 
 const loadApp = () => {
@@ -121,7 +145,27 @@ const loadApp = () => {
                 ui.updateDashboard()
                 ui.announce('Transaction deleted', 'assertive')
             }
+            if (action === 'edit') {
+                const rec = state.getData().find(r => r.id === id)
+                if (!rec) return;
+
+                document.getElementById('form_description').value = rec.description;
+                document.getElementById('form_category').value = rec.category;
+                document.getElementById('form_date').value = rec.date;
+
+                const isExpense = rec.amount < 0;
+                document.getElementById('form_type').value = isExpense ? 'expense' : 'income';
+                document.getElementById('form_amount').value = Math.abs(rec.amount).toFixed(2);
+
+                editingId = id;
+                submitButton.textContent = 'Update Transaction';
+                submitButton.setAttribute('data-action', 'update');
+
+                ui.View('form');
+                ui.announce('Editing transaction…', 'polite');
+            }
         }
+
     });
 
     CapButton.addEventListener('click', Settings_Saved)
